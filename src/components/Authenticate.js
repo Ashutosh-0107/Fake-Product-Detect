@@ -1,20 +1,35 @@
 import React, { useState, useEffect } from "react";
 import { QrReader } from "react-qr-reader";
 import axios from "axios";
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useNavigate } from "react-router-dom";
 import "../css/Authenticate.css";
+
+
 const Authenticate = ({ account }) => {
+  const navigate = useNavigate();
   const [auth, setAuth] = useState(false);
   const [message, setMessage] = useState("");
   return (
     <>
-      <div className="cam">
+      <FontAwesomeIcon icon="fa-solid fa-xmark" />
+      
+      <div style={{ display: "flex", justifyContent: "between" }}>
+        <FontAwesomeIcon
+          icon="fa-solid fa-arrow-left"
+          className="menu-icon"
+          style={{ cursor: "pointer", marginTop: 20 }}
+          onClick={() => navigate(-1)}
+        />
         <h4 style={{ color: "#000", position: "fixed", right: 8, top: 2 }}>
-          Wallet Address:{" "}
+          Wallet Address:
           {account.substring(0, 4) +
             "..." +
             account.substring(account.length - 4, account.length)}
         </h4>
+      </div>
+      
+      <div className="cam">
         <br />
         <h2 style={{ position: "absolute", top: 20 }}>
           Hold QR Code Steady and Clear to Scan
@@ -27,9 +42,13 @@ const Authenticate = ({ account }) => {
                 let res = await axios.get(
                   `https://api-rinkeby.etherscan.io/api?module=proxy&action=eth_getTransactionByHash&txhash=${data.hash}&apikey=${process.env.REACT_APP_ETHERSCAN_API_KEY}`
                 );
+                console.log("RES:",res)
                 if (res) {
                   setMessage("Product is Authenticated ✅");
                   setAuth(true);
+                } else {
+                  setMessage("Product is Not-Authenticated ❌");
+                  setAuth(false);
                 }
               }
             }
