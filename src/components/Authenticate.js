@@ -36,26 +36,35 @@ const Authenticate = ({ account }) => {
         </h2>
         <QrReader
           onResult={async (result, error) => {
-            if (!!result && !!result?.text) {
-              let data = JSON.parse(result?.text);
-              if (data.hash) {
-                let res = await axios.get(
-                  `https://api-rinkeby.etherscan.io/api?module=proxy&action=eth_getTransactionByHash&txhash=${data.hash}&apikey=${process.env.REACT_APP_ETHERSCAN_API_KEY}`
-                );
-                console.log("RES:",res)
-                if (res) {
-                  setMessage("Product is Authenticated ✅");
-                  setAuth(true);
-                } else {
-                  setMessage("Product is Not-Authenticated ❌");
-                  setAuth(false);
-                }
-              }
-            }
-            if (!!error) {
-              console.info(error);
-            }
-          }}
+  if (result && result.text) {
+    let data = JSON.parse(result.text);
+    console.log("DATA:", data); // Log data to check if it's parsed correctly
+    if (data.hash) {
+      try {
+        let res = await axios.get(
+          https://api-rinkeby.etherscan.io/api?module=proxy&action=eth_getTransactionByHash&txhash=${data.hash}&apikey=${process.env.REACT_APP_ETHERSCAN_API_KEY}
+        );
+        console.log("RES:", res); // Log response to check the received data
+        if (res.data && res.data.result) {
+          setMessage("Product is Authenticated ✅");
+          setAuth(true);
+        } else {
+          setMessage("Product is Not Authenticated ❌");
+          setAuth(false);
+        }
+      } catch (error) {
+        console.log("Error:", error); // Log any error during the API call
+        setMessage("Error occurred while authenticating product");
+        setAuth(false);
+      }
+    }
+  }
+  if (error) {
+    console.log("ERROR:", error); // Log any error from the QR reader
+    setMessage("Error occurred while scanning QR code");
+    setAuth(false);
+  }
+}}
           style={{ width: "100%" }}
         />
         <div
